@@ -6,6 +6,7 @@ pipeline {
         ADACTIN_PORT  = '443'
         ADACTIN_PROTO = 'https'
         JMETER_HOME   = 'C:\\Users\\Vish\\Downloads\\Vish\\apache-jmeter-5.6.3\\apache-jmeter-5.6.3'
+        PYTHON        = 'C:\\Users\\Vish\\AppData\\Local\\Python\\bin\\python.exe'
         THREADS       = '5'
         RAMPUP        = '10'
         DURATION      = '120'
@@ -47,7 +48,7 @@ pipeline {
         stage('Performance Gate') {
             steps {
                 bat """
-                    python scripts\\check_p95.py ^
+                    "%PYTHON%" scripts\\check_p95.py ^
                         results\\adactin_%BUILD_NUMBER%.jtl ^
                         %P95_SLA%
                 """
@@ -57,7 +58,7 @@ pipeline {
         stage('Trend Gate') {
             steps {
                 bat """
-                    python scripts\\check_trend.py ^
+                    "%PYTHON%" scripts\\check_trend.py ^
                         results ^
                         results\\adactin_%BUILD_NUMBER%.jtl ^
                         15
@@ -84,9 +85,9 @@ pipeline {
                 reportName:            "JMeter Report Build ${BUILD_NUMBER}"
             ])
             archiveArtifacts(
-                artifacts:   'results/*.jtl',
-                fingerprint: true,
-                allowEmptyArchive: true
+                artifacts:             'results/*.jtl',
+                fingerprint:           true,
+                allowEmptyArchive:     true
             )
         }
         success {
