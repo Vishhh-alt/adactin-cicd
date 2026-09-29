@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Sessions 14+15 - REST API + Listeners - Adactin Hotel" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Sessions 14+15 - REST API + Listeners - Adactin Hotel">
       <stringProp name="TestPlan.comments">
         JMeter Bootcamp - Sessions 14 and 15
         App: Adactin Hotel (https://adactinhotelapp.com)
@@ -9,7 +9,7 @@
 
         SESSION 14: REST API Testing
           Demonstrates HTTP verbs, API chaining, JSON body, authentication
-          Flow: Login -> Search -> Select -> Book -> Confirm -> Logout
+          Flow: Login -&gt; Search -&gt; Select -&gt; Book -&gt; Confirm -&gt; Logout
           API chaining: hotel name extracted in Search, used in Book
           Authentication: PHPSESSID cookie (Cookie Manager handles automatically)
 
@@ -36,18 +36,16 @@
 
         Instructor: Visvashwarr Venugopal | Sr. Technical Lead - Performance Engineering
       </stringProp>
-      <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments">
           <elementProp name="USERNAME" elementType="Argument">
             <stringProp name="Argument.name">USERNAME</stringProp>
-            <stringProp name="Argument.value">${__P(username,YOUR_ADACTIN_USERNAME)}</stringProp>
+            <stringProp name="Argument.value">${__P(username,sysusersysuser1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="PASSWORD" elementType="Argument">
             <stringProp name="Argument.name">PASSWORD</stringProp>
-            <stringProp name="Argument.value">${__P(password,YOUR_ADACTIN_PASSWORD)}</stringProp>
+            <stringProp name="Argument.value">${__P(password,Q35ES0)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="THREADS" elementType="Argument">
@@ -74,89 +72,59 @@
       </elementProp>
     </TestPlan>
     <hashTree>
-
-      <!-- ═══════════════════════════════════════════════
-           GLOBAL CONFIG
-           ═══════════════════════════════════════════════ -->
-
-      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Defaults - adactinhotelapp.com HTTPS" enabled="true">
-        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
-          <collectionProp name="Arguments.arguments"/>
-        </elementProp>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Defaults - adactinhotelapp.com HTTPS">
         <stringProp name="HTTPSampler.domain">adactinhotelapp.com</stringProp>
         <stringProp name="HTTPSampler.port">443</stringProp>
         <stringProp name="HTTPSampler.protocol">https</stringProp>
         <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-        <boolProp name="HTTPSampler.image_parser">false</boolProp>
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.implementation"></stringProp>
       </ConfigTestElement>
       <hashTree/>
-
-      <!--
-        SESSION 14: HTTP Cookie Manager
-        TEACHING: Adactin uses PHPSESSID session cookie for authentication
-        Cookie Manager stores every Set-Cookie header automatically
-        Sends the cookie on every subsequent request to the same domain
-        clearEachIteration=TRUE: each loop starts with a fresh session
-        Without this: login succeeds but search returns 302 redirect to login
-      -->
-      <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="S14 Cookie Manager - PHPSESSID session auth (mandatory for Adactin)" enabled="true">
+      <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="S14 Cookie Manager - PHPSESSID session auth (mandatory for Adactin)">
         <collectionProp name="CookieManager.cookies"/>
         <boolProp name="CookieManager.clearEachIteration">true</boolProp>
         <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
         <stringProp name="CookieManager.policy">best-match</stringProp>
-        <stringProp name="CookieManager.implementation">HC4CookieHandler</stringProp>
       </CookieManager>
       <hashTree/>
-
-      <!-- ═══════════════════════════════════════════════
-           MAIN THREAD GROUP
-           ═══════════════════════════════════════════════ -->
-
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Adactin Hotel Booking - Sessions 14+15" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <intProp name="LoopController.loops">1</intProp>
-        </elementProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Adactin Hotel Booking - Sessions 14+15">
         <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${RAMPUP}</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.comments">
-          Default: 5 threads, 10s ramp, 1 loop each.
-          For load: -Jthreads=20 -Jrampup=30 -Jduration=120
-          1 loop = one complete booking journey per user.
-          Transaction Controller wraps the full journey for S15 HTML report.
-        </stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
       </ThreadGroup>
       <hashTree>
-
+        <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="S14 Cookie Manager - PHPSESSID session auth (mandatory for Adactin)">
+          <collectionProp name="CookieManager.cookies"/>
+          <boolProp name="CookieManager.clearEachIteration">true</boolProp>
+          <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+          <stringProp name="CookieManager.policy">best-match</stringProp>
+        </CookieManager>
+        <hashTree/>
         <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think Time 1-3s (realistic user pace)" enabled="true">
           <stringProp name="RandomTimer.range">2000</stringProp>
           <stringProp name="ConstantTimer.delay">1000</stringProp>
         </UniformRandomTimer>
         <hashTree/>
-
-        <!--
-          SESSION 15: Transaction Controller
-          TEACHING: Wraps all booking steps into ONE row in the HTML report
-          "TC: Complete Booking Journey" shows end-to-end P95 in Statistics Table
-          This is what the client sees: "how long does a complete booking take?"
-          Without TC: report shows 6 separate rows with individual times
-          With TC:    report shows both individual rows AND the combined journey row
-        -->
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="TC: Complete Booking Journey (S15 - end-to-end time in HTML report)" enabled="true">
-          <boolProp name="TransactionController.includeTimers">false</boolProp>
           <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
         </TransactionController>
         <hashTree>
-
-          <!-- ═══════════════════════════════════════════
-               STEP 1: LOGIN
-               SESSION 14: POST verb, form-encoded body
-               Authentication: Cookie Manager captures PHPSESSID automatically
-               ═══════════════════════════════════════════ -->
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01 - POST Login (S14: form-encoded body, cookie auth)" enabled="true">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01 - POST Login (S14: form-encoded body, cookie auth)">
+            <stringProp name="HTTPSampler.path">/index.php</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="username" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">true</boolProp>
@@ -178,15 +146,11 @@
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.path">/index.php</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Login: page contains Search Hotel" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">Search Hotel</stringProp>
+                <stringProp name="-1216167620">Search Hotel</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message">Login failed. Update USERNAME and PASSWORD in User Defined Variables.</stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -195,18 +159,17 @@
             </ResponseAssertion>
             <hashTree/>
             <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA: Login must complete within 2000ms" enabled="true">
-              <longProp name="DurationAssertion.duration">2000</longProp>
+              <stringProp name="DurationAssertion.duration">2000</stringProp>
             </DurationAssertion>
             <hashTree/>
           </hashTree>
-
-          <!-- ═══════════════════════════════════════════
-               STEP 2: SEARCH HOTELS
-               SESSION 14: GET verb with query parameters
-               API CHAINING: hotel name extracted here, used in booking step
-               ═══════════════════════════════════════════ -->
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02 - POST Search Hotels (S14: GET-style query, API chain begins)" enabled="true">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02 - POST Search Hotels (S14: GET-style query, API chain begins)">
+            <stringProp name="HTTPSampler.path">/SearchHotel.php</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="location" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
@@ -264,29 +227,19 @@
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.path">/SearchHotel.php</stringProp>
-            <stringProp name="HTTPSampler.method">GET</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <!--
-              SESSION 14: API CHAINING - extract hotel radio button value
-              This value feeds into Step 3 (SelectHotel)
-              TEACHING: RegEx Extractor after the sampler that produces the value
-                        Default value = meaningful string for debugging
-                        ${radioHotelValue} used in next sampler
-            -->
-            <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="S14 Extract - radiobutton value (API chain: Search -> Select)" enabled="true">
+            <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="S14 Extract - radiobutton value (API chain: Search -&gt; Select)" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">radioHotelValue</stringProp>
-              <stringProp name="RegexExtractor.regex">name="radiobutton"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;radiobutton&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">NO_HOTEL_FOUND</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="S14 Extract - hotel name (API chain: used in booking body)" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">hotelName</stringProp>
@@ -294,12 +247,13 @@
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">Hotel Creek</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Search returned hotels (radiobutton present)" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">radiobutton</stringProp>
+                <stringProp name="24646381">radiobutton</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message">Search returned no hotels. Try changing location or dates. Check ${LOCATION} variable.</stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -307,20 +261,18 @@
               <intProp name="Assertion.test_type">2</intProp>
             </ResponseAssertion>
             <hashTree/>
-
             <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA: Search Hotels must complete within 3000ms" enabled="true">
-              <longProp name="DurationAssertion.duration">3000</longProp>
+              <stringProp name="DurationAssertion.duration">3000</stringProp>
             </DurationAssertion>
             <hashTree/>
           </hashTree>
-
-          <!-- ═══════════════════════════════════════════
-               STEP 3: SELECT HOTEL
-               SESSION 14: POST with radiobutton value from Step 2
-               API CHAINING: ${radioHotelValue} extracted in Step 2
-               ═══════════════════════════════════════════ -->
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="03 - POST Select Hotel (S14: API chain uses radioHotelValue from Step 2)" enabled="true">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="03 - POST Select Hotel (S14: API chain uses radioHotelValue from Step 2)">
+            <stringProp name="HTTPSampler.path">/SelectHotel.php</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="radiobutton" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
@@ -336,15 +288,11 @@
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.path">/SelectHotel.php</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Hotel selected (booking form loaded)" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">firstname</stringProp>
+                <stringProp name="133788987">firstname</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message">Hotel selection failed. radioHotelValue may be NO_HOTEL_FOUND. Check Step 2 regex against search results HTML.</stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -352,89 +300,91 @@
               <intProp name="Assertion.test_type">2</intProp>
             </ResponseAssertion>
             <hashTree/>
-
-            <!-- Extract all hidden fields from BookHotel form -->
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract hotel_name hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">hotel_name_hid</stringProp>
-              <stringProp name="RegexExtractor.regex">name="hotel_name"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;hotel_name&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">Hotel Creek</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract room_type hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">room_type_hid</stringProp>
-              <stringProp name="RegexExtractor.regex">name="room_type"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;room_type&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">Standard</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract temp_price hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">temp_price</stringProp>
-              <stringProp name="RegexExtractor.regex">name="temp_price"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;temp_price&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">100</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract total_rooms_cost hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">total_rooms_cost</stringProp>
-              <stringProp name="RegexExtractor.regex">name="total_rooms_cost"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;total_rooms_cost&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">200</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract final_price_reg hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">final_price_reg</stringProp>
-              <stringProp name="RegexExtractor.regex">name="final_price_reg"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;final_price_reg&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">200</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract final_price_hid hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">final_price_hid</stringProp>
-              <stringProp name="RegexExtractor.regex">name="final_price_hid"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;final_price_hid&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">200</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
-
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract GST_price hidden field" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">GST_price</stringProp>
-              <stringProp name="RegexExtractor.regex">name="GST_price"\s+value="([^"]+)"</stringProp>
+              <stringProp name="RegexExtractor.regex">name=&quot;GST_price&quot;\s+value=&quot;([^&quot;]+)&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default">0</stringProp>
               <stringProp name="RegexExtractor.match_no">1</stringProp>
+              <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
+              <stringProp name="RegexExtractor.match_number"></stringProp>
             </RegexExtractor>
             <hashTree/>
           </hashTree>
-
-          <!-- ═══════════════════════════════════════════
-               STEP 4: BOOK HOTEL
-               SESSION 14: POST with JSON-style body built from extracted values
-               TEACHING: PreProcessor builds the body dynamically
-                         Form-encoded body (not JSON) — Adactin uses PHP forms
-                         Content-Type: application/x-www-form-urlencoded
-               ═══════════════════════════════════════════ -->
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="04 - POST Book Hotel (S14: form-encoded body from extracted values)" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="04 - POST Book Hotel (S14: form-encoded body from extracted values)">
+            <stringProp name="HTTPSampler.path">/BookingConfirm.php</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
             <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
@@ -443,18 +393,8 @@
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.path">/BookingConfirm.php</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <!--
-              SESSION 14: Content-Type for form-encoded body
-              TEACHING: application/x-www-form-urlencoded for HTML form data
-                        application/json for REST API JSON bodies
-                        Wrong Content-Type = 400 Bad Request or silent failure
-            -->
             <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="S14 Content-Type: form-encoded (NOT json - Adactin uses PHP forms)" enabled="true">
               <collectionProp name="HeaderManager.headers">
                 <elementProp name="" elementType="Header">
@@ -464,14 +404,6 @@
               </collectionProp>
             </HeaderManager>
             <hashTree/>
-
-            <!--
-              SESSION 14: Build form body from extracted hidden fields
-              TEACHING: This is the "body construction" concept
-                        All values come from previous steps (API chaining)
-                        URLEncoder.encode() prevents & characters breaking the body
-                        Chain: trim() -> replaceAll() -> URLEncoder.encode()
-            -->
             <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="S14 PreProcessor - Build booking form body (API chaining + body construction)" enabled="true">
               <stringProp name="cacheKey">true</stringProp>
               <stringProp name="filename"></stringProp>
@@ -481,51 +413,50 @@
 // All values came from RegEx Extractors in previous steps (API chaining)
 // Elvis ?: provides safe defaults if extraction failed
 
-def hotelName = vars.get("hotel_name_hid") ?: vars.get("hotelName") ?: "Hotel Creek"
-def roomType  = vars.get("room_type_hid")  ?: "Standard"
+def hotelName = vars.get(&quot;hotel_name_hid&quot;) ?: vars.get(&quot;hotelName&quot;) ?: &quot;Hotel Creek&quot;
+def roomType  = vars.get(&quot;room_type_hid&quot;)  ?: &quot;Standard&quot;
 
 // Clean and URL-encode string fields
 // replaceAll() chain: remove HTML entities then encode for form submission
 def encodedHotel = java.net.URLEncoder.encode(
-    hotelName.trim().replaceAll("&amp;amp;", "&amp;").replaceAll("[^\\w\\s\\-]", "").trim(),
-    "UTF-8"
+    hotelName.trim().replaceAll(&quot;&amp;amp;&quot;, &quot;&amp;&quot;).replaceAll(&quot;[^\\w\\s\\-]&quot;, &quot;&quot;).trim(),
+    &quot;UTF-8&quot;
 )
-def encodedRoom = java.net.URLEncoder.encode(roomType.trim(), "UTF-8")
+def encodedRoom = java.net.URLEncoder.encode(roomType.trim(), &quot;UTF-8&quot;)
 
 // Build form-encoded body: key=value&amp;key=value
 // All hidden field values extracted from the booking form in Step 3
-def body = "hotel_name="         + encodedHotel
-         + "&amp;room_type="        + encodedRoom
-         + "&amp;arrival_date=10%2F12%2F2025"
-         + "&amp;departure_date=12%2F12%2F2025"
-         + "&amp;number_of_rooms=1"
-         + "&amp;adults=1"
-         + "&amp;child=0"
-         + "&amp;temp_price="       + (vars.get("temp_price") ?: "100")
-         + "&amp;total_rooms_cost=" + (vars.get("total_rooms_cost") ?: "200")
-         + "&amp;final_price_reg="  + (vars.get("final_price_reg") ?: "200")
-         + "&amp;final_price_hid="  + (vars.get("final_price_hid") ?: "200")
-         + "&amp;GST_price="        + (vars.get("GST_price") ?: "0")
-         + "&amp;firstname=Perf"
-         + "&amp;lastname=Test"
-         + "&amp;address=123+Test+Street"
-         + "&amp;cc_type=Visa"
-         + "&amp;cc_num=4111111111111111"
-         + "&amp;cc_cvv=123"
-         + "&amp;cc_exp_month=12"
-         + "&amp;cc_exp_year=2028"
-         + "&amp;Submit=Book+Now"
+def body = &quot;hotel_name=&quot;         + encodedHotel
+         + &quot;&amp;room_type=&quot;        + encodedRoom
+         + &quot;&amp;arrival_date=10%2F12%2F2025&quot;
+         + &quot;&amp;departure_date=12%2F12%2F2025&quot;
+         + &quot;&amp;number_of_rooms=1&quot;
+         + &quot;&amp;adults=1&quot;
+         + &quot;&amp;child=0&quot;
+         + &quot;&amp;temp_price=&quot;       + (vars.get(&quot;temp_price&quot;) ?: &quot;100&quot;)
+         + &quot;&amp;total_rooms_cost=&quot; + (vars.get(&quot;total_rooms_cost&quot;) ?: &quot;200&quot;)
+         + &quot;&amp;final_price_reg=&quot;  + (vars.get(&quot;final_price_reg&quot;) ?: &quot;200&quot;)
+         + &quot;&amp;final_price_hid=&quot;  + (vars.get(&quot;final_price_hid&quot;) ?: &quot;200&quot;)
+         + &quot;&amp;GST_price=&quot;        + (vars.get(&quot;GST_price&quot;) ?: &quot;0&quot;)
+         + &quot;&amp;firstname=Perf&quot;
+         + &quot;&amp;lastname=Test&quot;
+         + &quot;&amp;address=123+Test+Street&quot;
+         + &quot;&amp;cc_type=Visa&quot;
+         + &quot;&amp;cc_num=4111111111111111&quot;
+         + &quot;&amp;cc_cvv=123&quot;
+         + &quot;&amp;cc_exp_month=12&quot;
+         + &quot;&amp;cc_exp_year=2028&quot;
+         + &quot;&amp;Submit=Book+Now&quot;
 
-vars.put("bookingFormBody", body)
-log.info("S14 Booking | Hotel: " + hotelName + " | Thread: " + ctx.getThread().getThreadName())
+vars.put(&quot;bookingFormBody&quot;, body)
+log.info(&quot;S14 Booking | Hotel: &quot; + hotelName + &quot; | Thread: &quot; + ctx.getThread().getThreadName())
               </stringProp>
               <stringProp name="scriptLanguage">groovy</stringProp>
             </JSR223PreProcessor>
             <hashTree/>
-
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Booking submitted (confirmation page loaded)" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">Booking Confirmation</stringProp>
+                <stringProp name="796718300">Booking Confirmation</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message">Booking form POST failed. Body may be missing required fields. Enable Debug Sampler and check bookingFormBody variable.</stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -533,38 +464,25 @@ log.info("S14 Booking | Hotel: " + hotelName + " | Thread: " + ctx.getThread().g
               <intProp name="Assertion.test_type">2</intProp>
             </ResponseAssertion>
             <hashTree/>
-
             <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA: Booking must complete within 5000ms" enabled="true">
-              <longProp name="DurationAssertion.duration">5000</longProp>
+              <stringProp name="DurationAssertion.duration">5000</stringProp>
             </DurationAssertion>
             <hashTree/>
           </hashTree>
-
-          <!-- ═══════════════════════════════════════════
-               STEP 5: VIEW CONFIRMATION
-               SESSION 14: GET the booking itinerary (read after write)
-               SESSION 15: PostProcessor extracts booking ref for report
-               ═══════════════════════════════════════════ -->
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="05 - GET Booking Confirmation (S14: read-after-write | S15: extract bookingRef)" enabled="true">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+            <stringProp name="HTTPSampler.path">/BookedItinerary.php</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
-            <stringProp name="HTTPSampler.path">/BookedItinerary.php</stringProp>
-            <stringProp name="HTTPSampler.method">GET</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <!--
-              SESSION 15: Assert business success — not just HTTP 200
-              TEACHING: Adactin returns HTTP 200 even for failed bookings
-                        Without this assertion: error rate = 0% even when bookings fail
-                        With it: JTL success=false when booking reference missing
-                        This is the most important S15 assertion teaching point
-            -->
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="S15 Assert - Booking Reference present (HTTP 200 hides failed bookings)" enabled="true">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">Booking Confirmation id</stringProp>
+                <stringProp name="1045631711">Booking Confirmation id</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message">Booking reference not found on confirmation page. Booking may have failed silently (returned HTTP 200 with error).</stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -572,13 +490,10 @@ log.info("S14 Booking | Hotel: " + hotelName + " | Thread: " + ctx.getThread().g
               <intProp name="Assertion.test_type">2</intProp>
             </ResponseAssertion>
             <hashTree/>
-
             <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA: Confirmation page must load within 3000ms" enabled="true">
-              <longProp name="DurationAssertion.duration">3000</longProp>
+              <stringProp name="DurationAssertion.duration">3000</stringProp>
             </DurationAssertion>
             <hashTree/>
-
-            <!-- Extract booking reference for logging and verification -->
             <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="S14+15 PostProcessor - Extract bookingRef + log result" enabled="true">
               <stringProp name="cacheKey">true</stringProp>
               <stringProp name="filename"></stringProp>
@@ -586,10 +501,10 @@ log.info("S14 Booking | Hotel: " + hotelName + " | Thread: " + ctx.getThread().g
               <stringProp name="script">
 // Null safety guards — always first in PostProcessor
 def body = prev.getResponseDataAsString()
-if (!body) { vars.put("bookingRef", "EMPTY"); return }
+if (!body) { vars.put(&quot;bookingRef&quot;, &quot;EMPTY&quot;); return }
 if (!prev.isSuccessful()) {
-    log.warn("S14 Confirmation failed | HTTP: " + prev.getResponseCode() + " | Thread: " + ctx.getThread().getThreadName())
-    vars.put("bookingRef", "FAILED")
+    log.warn(&quot;S14 Confirmation failed | HTTP: &quot; + prev.getResponseCode() + &quot; | Thread: &quot; + ctx.getThread().getThreadName())
+    vars.put(&quot;bookingRef&quot;, &quot;FAILED&quot;)
     return
 }
 
@@ -604,139 +519,136 @@ if (!ref) {
     if (m2.find()) { ref = m2.group(1)?.trim() }
 }
 
-vars.put("bookingRef", ref ?: "REF_NOT_FOUND")
+vars.put(&quot;bookingRef&quot;, ref ?: &quot;REF_NOT_FOUND&quot;)
 if (ref) {
-    log.info("S14 Booking confirmed | Ref: " + ref + " | Thread: " + ctx.getThread().getThreadName())
+    log.info(&quot;S14 Booking confirmed | Ref: &quot; + ref + &quot; | Thread: &quot; + ctx.getThread().getThreadName())
 } else {
-    log.warn("S14 Ref not found | Check regex vs actual page HTML in View Results Tree")
+    log.warn(&quot;S14 Ref not found | Check regex vs actual page HTML in View Results Tree&quot;)
 }
               </stringProp>
               <stringProp name="scriptLanguage">groovy</stringProp>
             </JSR223PostProcessor>
             <hashTree/>
           </hashTree>
-
-          <!-- ═══════════════════════════════════════════
-               STEP 6: LOGOUT
-               SESSION 14: GET to end the session cleanly
-               Ensures cookie is cleared server-side
-               ═══════════════════════════════════════════ -->
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="06 - GET Logout (S14: end session, server clears PHPSESSID)" enabled="true">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+            <stringProp name="HTTPSampler.path">/logout.php</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
-            <stringProp name="HTTPSampler.path">/logout.php</stringProp>
-            <stringProp name="HTTPSampler.method">GET</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree/>
-
         </hashTree>
-
-        <!-- Debug Sampler — enable for 1-user verification -->
         <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="DEBUG - Verify all variables (DISABLE before load run)" enabled="false">
           <boolProp name="displayJMeterVariables">true</boolProp>
           <boolProp name="displayJMeterProperties">false</boolProp>
           <boolProp name="displaySystemProperties">false</boolProp>
         </DebugSampler>
         <hashTree/>
-
-        <!-- ═══════════════════════════════════════════════════════
-             SESSION 15 — LISTENERS
-             TEACHING: Which to use, which destroys performance
-             ═══════════════════════════════════════════════════════ -->
-
-        <!--
-          SESSION 15: VIEW RESULTS TREE — DISABLED
-          TEACHING: MUST be disabled before every load run.
-          Stores full response body for every sample in JVM heap.
-          At 50 users x 6 samplers x ~5KB responses = 1.5MB/sec into heap.
-          OutOfMemoryError in 2-3 minutes. Test crashes. JTL file lost.
-          Right-click -> Enable ONLY for 1-5 user debugging.
-          Right-click -> Disable before running at load.
-        -->
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="S15 View Results Tree - DISABLED (1-5 users debug only, crashes at load)" enabled="false">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
             <value class="SampleSaveConfiguration">
-              <time>true</time><latency>true</latency><timestamp>true</timestamp>
-              <success>true</success><label>true</label><code>true</code>
-              <message>true</message><threadName>true</threadName>
-              <dataType>true</dataType><encoding>false</encoding>
-              <assertions>true</assertions><subresults>true</subresults>
-              <responseData>true</responseData><samplerData>true</samplerData>
-              <xml>false</xml><fieldNames>true</fieldNames>
-              <responseHeaders>true</responseHeaders><requestHeaders>true</requestHeaders>
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>true</responseData>
+              <samplerData>true</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>true</responseHeaders>
+              <requestHeaders>true</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
             </value>
           </objProp>
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-
-        <!--
-          SESSION 15: SUMMARY REPORT — enabled, no file
-          TEACHING: Low overhead. Use for quick check during test.
-          No percentiles — use Aggregate Report for SLA reporting.
-          No filename = data in memory only, lost when JMeter closes.
-          This is intentional here — Summary Report is for real-time monitoring only.
-        -->
         <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="S15 Summary Report (quick check during run, no P95)" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
             <value class="SampleSaveConfiguration">
-              <time>true</time><latency>true</latency><timestamp>true</timestamp>
-              <success>true</success><label>true</label><code>true</code>
-              <message>true</message><threadName>true</threadName>
-              <dataType>true</dataType><encoding>false</encoding>
-              <assertions>true</assertions><subresults>false</subresults>
-              <responseData>false</responseData><samplerData>false</samplerData>
-              <xml>false</xml><fieldNames>true</fieldNames>
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>false</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
             </value>
           </objProp>
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-
-        <!--
-          SESSION 15: AGGREGATE REPORT — primary analysis tool
-          TEACHING: P90, P95, P99 per sampler. Use P95 for SLA reporting.
-          ALWAYS set a filename — data is lost when JMeter closes otherwise.
-          Timestamp in filename ensures each run gets a unique JTL file.
-          HTML report generated from this JTL:
-            jmeter -g results/adactin_booking_YYYYMMDD_HHMM.jtl -o report/
-        -->
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="S15 Aggregate Report - P95 + error% - SAVE TO JTL (primary analysis tool)" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
             <value class="SampleSaveConfiguration">
-              <time>true</time><latency>true</latency><timestamp>true</timestamp>
-              <success>true</success><label>true</label><code>true</code>
-              <message>true</message><threadName>true</threadName>
-              <dataType>true</dataType><encoding>false</encoding>
-              <assertions>true</assertions><subresults>false</subresults>
-              <responseData>false</responseData><samplerData>false</samplerData>
-              <xml>false</xml><fieldNames>true</fieldNames>
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>false</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
             </value>
           </objProp>
           <stringProp name="filename">results/adactin_booking_${__time(yyyyMMdd_HHmm,)}.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
-
-        <!--
-          SESSION 15: BACKEND LISTENER — InfluxDB real-time streaming
-          TEACHING: Streams every sample to InfluxDB while test runs.
-          Grafana reads from InfluxDB — live dashboard during the test.
-          Almost zero overhead — async, non-blocking.
-          DISABLED by default. Enable in Session 19 when Grafana is set up.
-          Start InfluxDB: docker run -p 8086:8086 influxdb:1.8
-        -->
         <BackendListener guiclass="BackendListenerGui" testclass="BackendListener" testname="S15 Backend Listener - InfluxDB (DISABLED - enable in Session 19 with Grafana)" enabled="false">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
             <collectionProp name="Arguments.arguments">
+              <elementProp name="influxdbMetricsSender" elementType="Argument">
+                <stringProp name="Argument.name">influxdbMetricsSender</stringProp>
+                <stringProp name="Argument.value">org.apache.jmeter.visualizers.backend.influxdb.HttpMetricsSender</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="influxdbUrl" elementType="Argument">
                 <stringProp name="Argument.name">influxdbUrl</stringProp>
                 <stringProp name="Argument.value">http://localhost:8086/write?db=jmeter</stringProp>
@@ -757,9 +669,24 @@ if (ref) {
                 <stringProp name="Argument.value">false</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="samplersRegex" elementType="Argument">
+                <stringProp name="Argument.name">samplersRegex</stringProp>
+                <stringProp name="Argument.value">.*</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="percentiles" elementType="Argument">
                 <stringProp name="Argument.name">percentiles</stringProp>
                 <stringProp name="Argument.value">90;95;99</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="testTitle" elementType="Argument">
+                <stringProp name="Argument.name">testTitle</stringProp>
+                <stringProp name="Argument.value">Test name</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="eventTags" elementType="Argument">
+                <stringProp name="Argument.name">eventTags</stringProp>
+                <stringProp name="Argument.value"></stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -767,9 +694,7 @@ if (ref) {
           <stringProp name="classname">org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient</stringProp>
         </BackendListener>
         <hashTree/>
-
       </hashTree>
-
     </hashTree>
   </hashTree>
 </jmeterTestPlan>
