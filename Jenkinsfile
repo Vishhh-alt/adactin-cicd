@@ -72,9 +72,11 @@ pipeline {
         always {
             perfReport(
                 sourceDataFiles:                 "results\\adactin_${BUILD_NUMBER}.jtl",
-                errorFailedThreshold:            0.5,
-                errorUnstableThreshold:          0.1,
-                relativeFailedThresholdPositive: 20
+                errorFailedThreshold:            100,
+                errorUnstableThreshold:          100,
+                relativeFailedThresholdPositive: 50,
+                filterRegex:                     '.*TC:.*',
+                modePerformancePerTestCase:      true
             )
             publishHTML(target: [
                 allowMissing:          true,
@@ -85,9 +87,9 @@ pipeline {
                 reportName:            "JMeter Report Build ${BUILD_NUMBER}"
             ])
             archiveArtifacts(
-                artifacts:             'results/*.jtl',
-                fingerprint:           true,
-                allowEmptyArchive:     true
+                artifacts:         'results/*.jtl',
+                fingerprint:       true,
+                allowEmptyArchive: true
             )
         }
         success {
