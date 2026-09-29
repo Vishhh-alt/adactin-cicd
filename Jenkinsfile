@@ -74,9 +74,7 @@ pipeline {
                 sourceDataFiles:                 "results\\adactin_${BUILD_NUMBER}.jtl",
                 errorFailedThreshold:            100,
                 errorUnstableThreshold:          100,
-                relativeFailedThresholdPositive: 50,
-                filterRegex:                     '.*TC:.*',
-                modePerformancePerTestCase:      true
+                relativeFailedThresholdPositive: 50
             )
             publishHTML(target: [
                 allowMissing:          true,
