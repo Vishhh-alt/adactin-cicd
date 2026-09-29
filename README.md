@@ -1,5 +1,5 @@
 # Adactin Hotel — CI/CD Performance Test Repository
-## JMeter Bootcamp — Sessions 26, 27, 28
+## JMeter Bootcamp
 
 ---
 
