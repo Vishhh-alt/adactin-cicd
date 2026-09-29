@@ -11,6 +11,8 @@ pipeline {
         RAMPUP        = '10'
         DURATION      = '120'
         P95_SLA       = '3000'
+        JTL_FILE      = "results\\adactin_${BUILD_NUMBER}.jtl"
+        REPORT_DIR    = "results\\report_${BUILD_NUMBER}"
     }
 
     stages {
@@ -21,10 +23,18 @@ pipeline {
             }
         }
 
+        stage('Clean Workspace') {
+            steps {
+                bat """
+                    if exist results rmdir /s /q results
+                    mkdir results
+                """
+            }
+        }
+
         stage('Performance Test') {
             steps {
                 bat """
-                    if not exist results mkdir results
                     "%JMETER_HOME%\\bin\\jmeter.bat" ^
                         -n ^
                         -t  jmx\\adactin_booking.jmx ^
@@ -34,8 +44,8 @@ pipeline {
                         -Jthreads=%THREADS% ^
                         -Jrampup=%RAMPUP% ^
                         -Jduration=%DURATION% ^
-                        -l  results\\adactin_%BUILD_NUMBER%.jtl ^
-                        -e  -o results\\report_%BUILD_NUMBER% ^
+                        -l  %JTL_FILE% ^
+                        -e  -o %REPORT_DIR% ^
                         -Jjmeter.save.saveservice.print_field_names=true ^
                         -Jjmeter.save.saveservice.data_type=false ^
                         -Jjmeter.save.saveservice.sent_bytes=false ^
@@ -49,7 +59,7 @@ pipeline {
             steps {
                 bat """
                     "%PYTHON%" scripts\\check_p95.py ^
-                        results\\adactin_%BUILD_NUMBER%.jtl ^
+                        %JTL_FILE% ^
                         %P95_SLA%
                 """
             }
@@ -60,7 +70,7 @@ pipeline {
                 bat """
                     "%PYTHON%" scripts\\check_trend.py ^
                         results ^
-                        results\\adactin_%BUILD_NUMBER%.jtl ^
+                        %JTL_FILE% ^
                         15
                 """
             }
@@ -71,7 +81,7 @@ pipeline {
     post {
         always {
             perfReport(
-                sourceDataFiles:                 "results\\adactin_${BUILD_NUMBER}.jtl",
+                sourceDataFiles:                 "${JTL_FILE}",
                 errorFailedThreshold:            100,
                 errorUnstableThreshold:          100,
                 relativeFailedThresholdPositive: 50
@@ -80,12 +90,12 @@ pipeline {
                 allowMissing:          true,
                 alwaysLinkToLastBuild: true,
                 keepAll:               true,
-                reportDir:             "results\\report_${BUILD_NUMBER}",
+                reportDir:             "${REPORT_DIR}",
                 reportFiles:           'index.html',
                 reportName:            "JMeter Report Build ${BUILD_NUMBER}"
             ])
             archiveArtifacts(
-                artifacts:         'results/*.jtl',
+                artifacts:         "${JTL_FILE}",
                 fingerprint:       true,
                 allowEmptyArchive: true
             )
