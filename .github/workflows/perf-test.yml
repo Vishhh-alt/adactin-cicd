@@ -1,0 +1,84 @@
+name: Adactin Performance Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+    env:
+      ADACTIN_HOST:   adactinhotelapp.com
+      ADACTIN_PORT:   443
+      ADACTIN_PROTO:  https
+      THREADS:        5
+      RAMPUP:         10
+      DURATION:       120
+      P95_SLA:        3000
+      JMETER_VERSION: 5.6.3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install JMeter
+        run: |
+          wget -q https://downloads.apache.org/jmeter/binaries/apache-jmeter-${{ env.JMETER_VERSION }}.tgz
+          tar -xzf apache-jmeter-${{ env.JMETER_VERSION }}.tgz
+          echo "JMETER_HOME=$PWD/apache-jmeter-${{ env.JMETER_VERSION }}" >> $GITHUB_ENV
+
+      - name: Run JMeter performance test
+        run: |
+          mkdir -p results
+          $JMETER_HOME/bin/jmeter \
+            -n \
+            -t  jmx/adactin_booking.jmx \
+            -Jhost=${{ env.ADACTIN_HOST }} \
+            -Jport=${{ env.ADACTIN_PORT }} \
+            -Jprotocol=${{ env.ADACTIN_PROTO }} \
+            -Jthreads=${{ env.THREADS }} \
+            -Jrampup=${{ env.RAMPUP }} \
+            -Jduration=${{ env.DURATION }} \
+            -l  results/adactin_${{ github.run_number }}.jtl \
+            -e  -o results/report \
+            -Jjmeter.save.saveservice.print_field_names=true \
+            -Jjmeter.save.saveservice.data_type=false \
+            -Jjmeter.save.saveservice.sent_bytes=false \
+            -Jjmeter.save.saveservice.idle_time=false \
+            -Jjmeter.save.saveservice.connect_time=false
+
+      - name: Performance Gate
+        run: |
+          python3 scripts/check_p95.py \
+            results/adactin_${{ github.run_number }}.jtl \
+            ${{ env.P95_SLA }}
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-results-${{ github.run_number }}
+          path: results/
+          retention-days: 30
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: perf-alerts
+          slack-message: |
+            PERF FAIL Build ${{ github.run_number }} Branch ${{ github.ref_name }}
+            See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
